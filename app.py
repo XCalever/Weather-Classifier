@@ -7,7 +7,7 @@ import os
 
 @st.cache_resource
 def load_model():
-    model_path = 'model.h5'
+    model_path = 'model_weather.hdf5'
     if not os.path.exists(model_path):
         st.error(f"Model file not found at {model_path}")
         return None
