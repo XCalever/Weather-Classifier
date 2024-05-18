@@ -1,17 +1,17 @@
 import streamlit as st
-import tensorflow
+import tensorflow as tf
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import numpy as np
 import os
 
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def load_model():
     model_path = 'model_weather.hdf5'
     if not os.path.exists(model_path):
         st.error(f"Model file not found at {model_path}")
         return None
-    model = tensorflow.keras.models.load_model(model_path)
+    model = tf.keras.models.load_model(model_path)
     return model
 
 def preprocess_image(image_data):
@@ -26,16 +26,24 @@ def preprocess_image(image_data):
 def predict_weather(image_data, model):
     if model is None:
         return "Model not loaded"
-    img = preprocess_image(image_data)
-    prediction = model.predict(img)
-    predicted_class = np.argmax(prediction, axis=1)[0]
-    return predicted_class
+
+    try:
+        img = preprocess_image(image_data)
+        st.write(f"Preprocessed image shape: {img.shape}")
+        prediction = model.predict(img)
+        st.write(f"Raw model prediction: {prediction}")
+        predicted_class = np.argmax(prediction, axis=1)[0]
+        return predicted_class
+    except Exception as e:
+        st.error(f"Error predicting: {str(e)}")
+        return "Prediction error"
 
 weather_labels = {
     0: 'Cloudy',
     1: 'Rainy',
     2: 'Shine',
-    3: 'Sunrise'}
+    3: 'Sunrise'
+}
 
 def main():
     st.title('Weather Classifier System')
@@ -49,12 +57,17 @@ def main():
         image_display = Image.open(file)
         st.image(image_display, caption='Uploaded Image', use_column_width=True)
 
-        predicted_class = predict_weather(file, model)
-        if predicted_class == "Model not loaded":
-            st.error(predicted_class)
+        if model:
+            predicted_class = predict_weather(file, model)
+            if predicted_class == "Model not loaded":
+                st.error(predicted_class)
+            elif predicted_class == "Prediction error":
+                st.error("An error occurred during prediction.")
+            else:
+                predicted_label = weather_labels.get(predicted_class, 'Unknown')
+                st.write(f"### Prediction: {predicted_label}")
         else:
-            predicted_label = weather_labels.get(predicted_class, 'Unknown')
-            st.write(f"### Prediction: {predicted_label}")
+            st.error("Model not loaded")
 
 if __name__ == '__main__':
     main()
