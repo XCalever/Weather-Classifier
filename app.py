@@ -15,27 +15,32 @@ def load_model():
     return model
 
 def preprocess_image(image_data):
-    img = Image.open(image_data)
-    img = img.convert('RGB')
-    img = img.resize((244, 244))
-    img = np.asarray(img)
-    img = img / 255.0
-    img = np.expand_dims(img, axis=0)
-    return img
+    try:
+        img = Image.open(image_data)
+        img = img.convert('RGB')
+        img = img.resize((244, 244))
+        img = np.asarray(img)
+        img = img / 255.0
+        img = np.expand_dims(img, axis=0)
+        return img
+    except Exception as e:
+        st.error(f"Error in image preprocessing: {str(e)}")
+        return None
 
 def predict_weather(image_data, model):
     if model is None:
         return "Model not loaded"
-
+    
+    img = preprocess_image(image_data)
+    if img is None:
+        return "Image preprocessing error"
+    
     try:
-        img = preprocess_image(image_data)
-        st.write(f"Preprocessed image shape: {img.shape}")
         prediction = model.predict(img)
-        st.write(f"Raw model prediction: {prediction}")
         predicted_class = np.argmax(prediction, axis=1)[0]
         return predicted_class
     except Exception as e:
-        st.error(f"Error predicting: {str(e)}")
+        st.error(f"Error during prediction: {str(e)}")
         return "Prediction error"
 
 weather_labels = {
@@ -61,8 +66,8 @@ def main():
             predicted_class = predict_weather(file, model)
             if predicted_class == "Model not loaded":
                 st.error(predicted_class)
-            elif predicted_class == "Prediction error":
-                st.error("An error occurred during prediction.")
+            elif predicted_class == "Prediction error" or predicted_class == "Image preprocessing error":
+                st.error(predicted_class)
             else:
                 predicted_label = weather_labels.get(predicted_class, 'Unknown')
                 st.write(f"### Prediction: {predicted_label}")
