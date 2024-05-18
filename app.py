@@ -5,11 +5,9 @@ from PIL import Image
 import numpy as np
 import os
 
-model_link = 'https://drive.google.com/file/d/17Puq3cl919vPg8RHbQwQCeLZIeQF02rN/view?usp=drive_link'
-
 @st.cache_resource
 def load_model():
-    model_path = model_link
+    model_path = 'model_weather.hdf5'
     if not os.path.exists(model_path):
         st.error(f"Model file not found at {model_path}")
         return None
