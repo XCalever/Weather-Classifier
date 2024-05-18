@@ -11,7 +11,7 @@ except ImportError as e:
     st.error(f"Failed to import TensorFlow. Please check your environment setup: {e}")
 
 # Function to load the TensorFlow model
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def load_model():
     try:
         model = tf.keras.models.load_model('model_weather.hdf5')
