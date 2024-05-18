@@ -1,5 +1,5 @@
 import streamlit as st
-import tensorflow as tf
+import tensorflow
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import numpy as np
@@ -7,7 +7,7 @@ import numpy as np
 # Function to load the TensorFlow model
 @st.cache_resource
 def load_model():
-    model = tf.keras.models.load_model('model_weather.hdf5')
+    model = tensorflow.keras.models.load_model('model_weather.hdf5')
     return model
 
 # Function to preprocess the image for prediction
