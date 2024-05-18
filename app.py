@@ -1,17 +1,17 @@
 import streamlit as st
-import tensorflow as tf
+import tensorflow
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import numpy as np
 import os
 
-@st.cache(allow_output_mutation=True)
+@st.cache_resource
 def load_model():
     model_path = 'model_weather.h5'
     if not os.path.exists(model_path):
         st.error(f"Model file not found at {model_path}")
         return None
-    model = tf.keras.models.load_model(model_path)
+    model = tensorflow.keras.models.load_model(model_path)
     return model
 
 def preprocess_image(image_data):
@@ -40,7 +40,7 @@ weather_labels = {
 def main():
     st.title('Weather Classifier System')
     st.write(f"Current working directory: {os.getcwd()}")
-    st.write(f"Model path: model_weather.h5")
+    st.write(f"Model path: model_weather.hdf5")
 
     model = load_model()
     file = st.file_uploader("Choose a weather photo from your computer", type=["jpg", "jpeg", "png"])
