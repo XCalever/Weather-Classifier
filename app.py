@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import os
 
-model_link = f'https://drive.google.com/file/d/17Puq3cl919vPg8RHbQwQCeLZIeQF02rN/view?usp=drive_link'
+model_link = 'https://drive.google.com/file/d/17Puq3cl919vPg8RHbQwQCeLZIeQF02rN/view?usp=drive_link'
 
 @st.cache_resource
 def load_model():
