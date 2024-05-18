@@ -30,7 +30,7 @@ def predict_weather(image_data, model):
 weather_labels = {
     0: 'Cloudy',
     1: 'Rainy',
-    2: 'Sunny',
+    2: 'Shine',
     3: 'Sunrise'}
 
 def main():
