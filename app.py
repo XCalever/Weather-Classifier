@@ -15,31 +15,21 @@ def load_model():
     return model
 
 def preprocess_image(image_data):
-    try:
-        img = Image.open(image_data)
-        img = img.convert('RGB')
-        img = img.resize((244, 244))  # Assuming the model expects 244x244 images
-        img = np.asarray(img)
-        img = img / 255.0
-        img = np.expand_dims(img, axis=0)
-        return img
-    except Exception as e:
-        st.error(f"Error in image preprocessing: {e}")
-        return None
+    img = Image.open(image_data)
+    img = img.convert('RGB')
+    img = img.resize((244, 244))  # Assuming the model expects 244x244 images
+    img = np.asarray(img)
+    img = img / 255.0
+    img = np.expand_dims(img, axis=0)
+    return img
 
 def predict_weather(image_data, model):
     if model is None:
         return "Model not loaded"
     img = preprocess_image(image_data)
-    if img is None:
-        return "Error in image preprocessing"
-    try:
-        prediction = model.predict(img)
-        predicted_class = np.argmax(prediction, axis=1)[0]
-        return predicted_class
-    except Exception as e:
-        st.error(f"Error during model prediction: {e}")
-        return "Error during model prediction"
+    prediction = model.predict(img)
+    predicted_class = np.argmax(prediction, axis=1)[0]
+    return predicted_class
 
 weather_labels = {
     0: 'Cloudy',
@@ -54,25 +44,18 @@ def main():
     st.write(f"Model path: model_weather.hdf5")
 
     model = load_model()
-    if model is None:
-        st.error("Model could not be loaded. Please ensure the model file exists and is accessible.")
-        return
-
     file = st.file_uploader("Choose a weather photo from your computer", type=["jpg", "jpeg", "png"])
 
     if file is not None:
-        try:
-            image_display = Image.open(file)
-            st.image(image_display, caption='Uploaded Image', use_column_width=True)
+        image_display = Image.open(file)
+        st.image(image_display, caption='Uploaded Image', use_column_width=True)
 
-            predicted_class = predict_weather(file, model)
-            if predicted_class == "Model not loaded" or predicted_class == "Error in image preprocessing" or predicted_class == "Error during model prediction":
-                st.error(predicted_class)
-            else:
-                predicted_label = weather_labels.get(predicted_class, 'Unknown')
-                st.write(f"### Prediction: {predicted_label}")
-        except Exception as e:
-            st.error(f"An error occurred while processing the image: {e}")
+        predicted_class = predict_weather(file, model)
+        if predicted_class == "Model not loaded":
+            st.error(predicted_class)
+        else:
+            predicted_label = weather_labels.get(predicted_class, 'Unknown')
+            st.write(f"### Prediction: {predicted_label}")
 
 if __name__ == '__main__':
     main()
