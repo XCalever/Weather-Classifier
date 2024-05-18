@@ -1,13 +1,18 @@
 import streamlit as st
-import tensorflow as tensorflow
+import tensorflow
 from tensorflow.keras.preprocessing import image
 from PIL import Image
 import numpy as np
+import os
 
 # Function to load the TensorFlow model
 @st.cache_resource
 def load_model():
-    model = tensorflow.keras.models.load_model('model_weather.hdf5')
+    model_path = 'model_weather.hdf5'
+    if not os.path.exists(model_path):
+        st.error(f"Model file not found at {model_path}")
+        return None
+    model = tensorflow.keras.models.load_model(model_path)
     return model
 
 # Function to preprocess the image for prediction
@@ -22,6 +27,8 @@ def preprocess_image(image_data):
 
 # Function to predict the weather class from the image
 def predict_weather(image_data, model):
+    if model is None:
+        return "Model not loaded"
     img = preprocess_image(image_data)
     prediction = model.predict(img)
     predicted_class = np.argmax(prediction, axis=1)[0]
@@ -35,6 +42,11 @@ weather_labels = {
 
 def main():
     st.title('Weather Classifier System')
+
+    # Debug: Print the current working directory and model path
+    st.write(f"Current working directory: {os.getcwd()}")
+    st.write(f"Model path: model_weather.hdf5")
+
     model = load_model()
     file = st.file_uploader("Choose a weather photo from your computer", type=["jpg", "jpeg", "png"])
 
@@ -43,10 +55,11 @@ def main():
         st.image(image_display, caption='Uploaded Image', use_column_width=True)
 
         predicted_class = predict_weather(file, model)
-        predicted_label = weather_labels.get(predicted_class, 'Unknown')
-
-        st.write("### Prediction:")
-        st.write(f"The predicted weather is: {predicted_label}")
+        if predicted_class == "Model not loaded":
+            st.error(predicted_class)
+        else:
+            predicted_label = weather_labels.get(predicted_class, 'Unknown')
+            st.write(f"### Prediction: {predicted_label}")
 
 if __name__ == '__main__':
     main()
