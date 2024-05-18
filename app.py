@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import os
 
-@st.cache_resource
+@st.cache(allow_output_mutation=True)
 def load_model():
     model_path = 'model_weather.h5'
     if not os.path.exists(model_path):
@@ -40,7 +40,7 @@ weather_labels = {
 def main():
     st.title('Weather Classifier System')
     st.write(f"Current working directory: {os.getcwd()}")
-    st.write(f"Model path: model_weather.hdf5")
+    st.write(f"Model path: model_weather.h5")
 
     model = load_model()
     file = st.file_uploader("Choose a weather photo from your computer", type=["jpg", "jpeg", "png"])
