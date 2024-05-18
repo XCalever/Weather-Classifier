@@ -5,7 +5,7 @@ from PIL import Image
 import numpy as np
 import os
 
-@st.cache_resource
+@st.cache(allow_output_mutation=True)
 def load_model():
     model_path = 'model_weather.hdf5'
     if not os.path.exists(model_path):
