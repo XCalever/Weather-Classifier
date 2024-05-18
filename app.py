@@ -5,7 +5,6 @@ from PIL import Image
 import numpy as np
 import os
 
-# Function to load the TensorFlow model
 @st.cache_resource
 def load_model():
     model_path = 'model_weather.hdf5'
@@ -15,17 +14,15 @@ def load_model():
     model = tensorflow.keras.models.load_model(model_path)
     return model
 
-# Function to preprocess the image for prediction
 def preprocess_image(image_data):
     img = Image.open(image_data)
-    img = img.convert('RGB')  # Ensure image is RGB (3 channels)
-    img = img.resize((244, 244))  # Resize image to match model's expected sizing
-    img = np.asarray(img)  # Convert PIL image to numpy array
-    img = img / 255.0  # Normalize pixel values
-    img = np.expand_dims(img, axis=0)  # Add batch dimension
+    img = img.convert('RGB')
+    img = img.resize((244, 244))
+    img = np.asarray(img)
+    img = img / 255.0
+    img = np.expand_dims(img, axis=0)
     return img
 
-# Function to predict the weather class from the image
 def predict_weather(image_data, model):
     if model is None:
         return "Model not loaded"
@@ -42,8 +39,6 @@ weather_labels = {
 
 def main():
     st.title('Weather Classifier System')
-
-    # Debug: Print the current working directory and model path
     st.write(f"Current working directory: {os.getcwd()}")
     st.write(f"Model path: model_weather.hdf5")
 
