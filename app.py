@@ -4,6 +4,7 @@ from tensorflow.keras.preprocessing import image
 from PIL import Image
 import numpy as np
 import os
+import traceback
 
 @st.cache_resource
 def load_model():
@@ -11,8 +12,12 @@ def load_model():
     if not os.path.exists(model_path):
         st.error(f"Model file not found at {model_path}")
         return None
-    model = tf.keras.models.load_model(model_path)
-    return model
+    try:
+        model = tf.keras.models.load_model(model_path)
+        return model
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
+        return None
 
 def preprocess_image(image_data):
     try:
@@ -25,6 +30,7 @@ def preprocess_image(image_data):
         return img
     except Exception as e:
         st.error(f"Error in image preprocessing: {str(e)}")
+        st.error(traceback.format_exc())
         return None
 
 def predict_weather(image_data, model):
@@ -41,6 +47,7 @@ def predict_weather(image_data, model):
         return predicted_class
     except Exception as e:
         st.error(f"Error during prediction: {str(e)}")
+        st.error(traceback.format_exc())
         return "Prediction error"
 
 weather_labels = {
