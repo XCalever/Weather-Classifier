@@ -4,7 +4,7 @@ from tensorflow.keras.preprocessing import image
 from PIL import Image
 import numpy as np
 import os
-import gdown
+import requests
 
 # Constants
 file_id = '17Puq3cl919vPg8RHbQwQCeLZIeQF02rN'
@@ -14,7 +14,11 @@ model_path = 'model_weather.hdf5'
 # Download the model file if it doesn't exist
 if not os.path.exists(model_path):
     st.write(f"Downloading model from Google Drive...")
-    gdown.download(url, model_path, quiet=False)
+    response = requests.get(url, stream=True)
+    with open(model_path, 'wb') as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            if chunk:
+                f.write(chunk)
 
 # Function to load the model
 @st.cache(allow_output_mutation=True)
